@@ -444,9 +444,10 @@ const BlackjackGame = () => {
                         var _res = "";
 
                         var _renge = [gameData.min];
-                        _renge.push(_renge[0] * 2);
+                        
                         _renge.push(_renge[0] * 5);
                         _renge.push(_renge[0] * 10);
+                        _renge.push(_renge[0] * 20);
                         var pBet = getBets(pNumber, userData.nickname);
                         var allBet = getAllBets(pNumber, userData.nickname);
                         if (pBet) {
@@ -454,36 +455,36 @@ const BlackjackGame = () => {
                         }
                         return (
                             <span  id={"slot"+pNumber} className={gameData.status == "Done" && gameData.gameOn && player.x == segments[gameData.number] ? "players result-win" : gameData.status == "Done" && gameData.gameOn ? "players result-lose" : "players"} key={pNumber} style={getTotalBets(pNumber)=="0K" && gameData.gameOn?{opacity:.1}:{}}>
-                                <div className={gameData.gameOn || gameData.min * 1000 > userData.balance || pBet ? "active empty-slot noclick-nohide" : "empty-slot noclick-nohide"} style={{ background: getcolor(player.x), color: getcolortext(player.x) }}>
+                                <div className={gameData.gameOn || gameData.min > userData.balance || pBet ? "active empty-slot noclick-nohide" : "empty-slot noclick-nohide"} style={{ background: getcolor(player.x), color: getcolortext(player.x) }}>
                                     x{player.x}
                                 </div>
                                 {!gameData.gameOn && gameTimer >= 0 && checkBets(pNumber, userData.nickname) && (
                                     <div id="bets-container">
                                         {_renge.map(function (bet, i) {
-                                            if (bet * 1000 <= userData.balance) {
+                                            if (bet <= userData.balance) {
                                                 return (
                                                     <span key={i} className={gameTimer < 2 && gameTimer >= -1 && gameData.gameStart ? "animate__zoomOut animate__animated" : ""}>
                                                         <button
                                                             className="betButtons  animate__faster animate__animated animate__zoomInUp"
                                                             style={{ animationDelay: i * 100 + "ms" }}
                                                             id={"chip" + i}
-                                                            value={bet * 1000}
+                                                            value={bet}
                                                             onClick={() => {
                                                                 chipPlace.play();
                                                                 $("#slot" + pNumber + " #bets-container .betButtons").removeAttr('style').removeClass('animate__zoomInUp').addClass("noclick-nohide animate__zoomOut");
                                                                
-                                                                socket.send(JSON.stringify({ method: "bet", amount: bet * 1000, theClient: userData, gameId: gameData.id, seat: pNumber }));
+                                                                socket.send(JSON.stringify({ method: "bet", amount: bet, theClient: userData, gameId: gameData.id, seat: pNumber }));
                                                             }}
                                                         >
-                                                            {doCurrencyMil(bet * 1000)}
+                                                            {doCurrencyMil(bet)}
                                                         </button>
                                                     </span>
                                                 );
                                             } else {
                                                 return (
                                                     <span key={i} className={gameTimer < 2 && gameTimer >= -1 && gameData.gameStart ? "animate__zoomOut animate__animated" : ""}>
-                                                        <button className="betButtons noclick noclick-nohide animate__animated animate__zoomInUp" style={{ animationDelay: i * 100 + "ms" }} id={"chip" + i} value={bet * 1000}>
-                                                            {doCurrencyMil(bet * 1000)}
+                                                        <button className="betButtons noclick noclick-nohide animate__animated animate__zoomInUp" style={{ animationDelay: i * 100 + "ms" }} id={"chip" + i} value={bet}>
+                                                            {doCurrencyMil(bet)}
                                                         </button>
                                                     </span>
                                                 );
