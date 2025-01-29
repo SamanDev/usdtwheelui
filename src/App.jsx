@@ -19,7 +19,7 @@ if (pathArr.length == 3) {
 //console.log(_auth);
 
 //const WEB_URL = process.env.REACT_APP_MODE === "production" ? `wss://${process.env.REACT_APP_DOMAIN_NAME}/` : `ws://${loc.hostname}:8080`;
-const WEB_URL = `wss://mwheel.royale777.vip/`;
+const WEB_URL = `wss://mwheel.usdtpoker.club/`;
 // (A) LOCK SCREEN ORIENTATION
 const betAreas = [{ x: 2 }, { x: 4 }, { x: 8 }, { x: 10 }, { x: 20 }, { x: 25 }];
 const getcolor = (item) => {
@@ -198,7 +198,7 @@ window.addEventListener(
 window.parent.postMessage("userget", "*");
 
 if (window.self == window.top) {
-    window.location.href = "https://www.google.com/";
+    //window.location.href = "https://www.google.com/";
 }
 let dealingSound = new Howl({
     src: ["/sounds/dealing_card_fix3.mp3"],
@@ -446,8 +446,9 @@ const BlackjackGame = () => {
                         var _renge = [gameData.min];
                         
                         _renge.push(_renge[0] * 5);
-                        _renge.push(_renge[0] * 10);
-                        _renge.push(_renge[0] * 20);
+                        _renge.push(_renge[0] * 25);
+                        _renge.push(_renge[0] * 100);
+
                         var pBet = getBets(pNumber, userData.nickname);
                         var allBet = getAllBets(pNumber, userData.nickname);
                         if (pBet) {

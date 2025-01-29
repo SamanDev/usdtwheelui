@@ -1445,8 +1445,12 @@ right: 90px;
   background: url("/imgs/chips/Casino_Chip_Red.svg") no-repeat;
   color: #fff;
 }
-.betButtons#chip2M {
+.betButtons#chip4 {
   background: url("/imgs/chips/Casino_Chip_Blue.svg") no-repeat;
+  color: #fff;
+}
+.betButtons#chip5 {
+  background: url("/imgs/chips/Casino_Chip_Black.svg") no-repeat;
   color: #fff;
 }
 
