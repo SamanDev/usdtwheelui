@@ -4,7 +4,7 @@ import { Howl } from "howler";
 import { Popup } from "semantic-ui-react";
 import $ from "jquery";
 import Info from "./components/Info";
-import Wheel from "./components/Wheel";
+import Wheel from "./components/WheelNew";
 import Loaderr from "./components/Loader";
 const segments = [0, 2, 4, 2, 10, 2, 4, 2, 8, 2, 4, 2, 25, 2, 4, 2, 8, 2, 4, 2, 10, 2, 4, 2, 8, 2, 4, 2, 20];
 
@@ -58,8 +58,6 @@ const doCurrency = (value) => {
     return val;
 };
 const doCurrencyMil = (value, fix) => {
-    var val = value?.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
-    return val;
     if (value < 1000000) {
         var val = doCurrency(parseFloat(value / 1000).toFixed(fix || fix == 0 ? fix : 0)) + "K";
     } else {
@@ -68,18 +66,6 @@ const doCurrencyMil = (value, fix) => {
     }
     return val;
 };
-function checkbox() {
-    if ($("#cadr2:visible").length) {
-        $("#cadr").show();
-        $("#cadr2").hide();
-    } else {
-        $("#cadr2").show();
-        $("#cadr").hide();
-    }
-}
-setInterval(() => {
-    checkbox();
-}, 500);
 function animateNum(){
     $('.counter').each(function() {
         var $this = $(this),
@@ -122,56 +108,7 @@ function animateNum(){
         }
     }
       });
-}const AppOrtion = () => {
-    var gWidth = $("#root").width() / 1400;
-    var gHight = $("#root").height() / 750;
-    var scale = gWidth<gHight?gWidth:gHight;
-    var highProtect = $("#root > div").height() * scale;
-    //console.log($("#root").width(),$("#root").height());
-   // console.log(gWidth,gHight,scale);
-   
-    
-
-    if (highProtect > 750) {
-        //console.log(gWidth,gHight,highProtect);
-        //gHight = $("#root").height() / 850;
-        // scale = (scale + gHight)/2;
-        scale = gHight;
-        highProtect = $("#root").height() * scale;
-        var _t = ($("#root").height() - highProtect)/2;
-        if(_t<0){_t=_t*-1}
-        
-        if (scale < 1) {
-            setTimeout(() => {
-                $("#scale").css("transform", "scale(" + scale + ")");
-            }, 10);
-        } else {
-            scale = 1;
-            setTimeout(() => {
-                $("#scale").css("transform", "scale(" + scale + ") translateY("+_t+"px)");
-            }, 10);
-        }
-    } else {
-       // gHight = $("#root").height() / 850;
-        // scale = (scale + gHight)/2;
-      //  scale = gHight;
-      var _t = ($("#root").height() - highProtect)/2;
-   if(_t<0){_t=_t*-1}
-        if (scale < 1) {
-            
-            setTimeout(() => {
-                $("#scale").css("transform", "scale(" + scale + ") translateY("+_t+"px)");
-            }, 10);
-        } else {
-            scale = 1;
-            setTimeout(() => {
-                $("#scale").css("transform", "scale(" + scale + ") translateY("+_t+"px)");
-            }, 10);
-        }
-    }
-
-    // console.log(gWidth,highProtect,gHight,scale)
-};
+}
 const socket = new WebSocket(WEB_URL, _auth);
 window.addEventListener("message", function (event) {
     if (event?.data?.username) {
@@ -185,20 +122,53 @@ window.addEventListener("message", function (event) {
         } catch (error) {}
     }
 });
-var supportsOrientationChange = "onorientationchange" in window,
-    orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
+const AppOrtion = () => {
+    if (!$("#scale").attr("style")) {
+        let maxWidth = 1400,
+            maxHeight = 750;
+        //console.log($("#root").width(),$("#root").height());
+        // console.log(gWidth,gHight,scale);
+        let scale,
+            width = $("#root").width(),
+            height = $("#root").height(),
+            isMax = width >= maxWidth && height >= maxHeight;
 
+        scale = Math.min(width / maxWidth, height / maxHeight);
+        let highProtect = ($("#root").height() * height) / maxHeight;
+
+        let _t = 0;
+        if (_t < 0) {
+            //_t = _t * -1;
+        }
+
+        if (isMax) {
+            $("#scale").css("transform", "scale(1)");
+        } else {
+            $("#scale").css("transform", "scale(" + scale + ")");
+        }
+    }
+
+    // console.log(gWidth,highProtect,gHight,scale)
+};
+
+let supportsOrientationChange = "onorientationchange" in window,
+    orientationEvent = supportsOrientationChange ? "orientationchange" : "resize";
+var sizeBln;
 window.addEventListener(
     orientationEvent,
     function () {
-        AppOrtion();
+        clearTimeout(sizeBln);
+        sizeBln = setTimeout(() => {
+            $("#scale").removeAttr("style");
+            AppOrtion();
+        }, 500);
     },
     false
 );
 window.parent.postMessage("userget", "*");
 
 if (window.self == window.top) {
-    //window.location.href = "https://www.google.com/";
+   // window.location.href = "https://www.google.com/";
 }
 let dealingSound = new Howl({
     src: ["/sounds/dealing_card_fix3.mp3"],
@@ -210,18 +180,6 @@ let chipHover = new Howl({
 });
 let chipPlace = new Howl({
     src: ["/sounds/chip_place.mp3"],
-    volume: 0.1,
-});
-let actionClick = new Howl({
-    src: ["/sounds/actionClick.mp3"],
-    volume: 0.1,
-});
-let defaultClick = new Howl({
-    src: ["/sounds/click_default.mp3"],
-    volume: 0.1,
-});
-let clickFiller = new Howl({
-    src: ["/sounds/click_filler.mp3"],
     volume: 0.1,
 });
 let timerRunningOut = new Howl({
@@ -266,7 +224,7 @@ const BlackjackGame = () => {
         userbet.map(function (bet, i) {
             Total = Total + bet.amount;
         });
-        return doCurrencyMil(Total);
+        return doCurrency(Total);
     };
     const getBets = (seat, username) => {
         var userbet = gameData.players.filter((bet) => bet.seat == seat && bet.nickname == username);
@@ -365,15 +323,16 @@ const BlackjackGame = () => {
         }
         setTimeout(() => {
             animateNum()
+            AppOrtion();
         }, 100);
-        AppOrtion();
+        
     }, [gamesData]);
     
     useEffect(() => {
         setTimeout(() => {
          
             AppOrtion();
-        }, 500);
+        }, 1000);
         
     }, []);
     // Agar gaData nist, ye matn "Loading" neshan bede
@@ -444,11 +403,9 @@ const BlackjackGame = () => {
                         var _res = "";
 
                         var _renge = [gameData.min];
-                        
                         _renge.push(_renge[0] * 5);
                         _renge.push(_renge[0] * 25);
                         _renge.push(_renge[0] * 100);
-
                         var pBet = getBets(pNumber, userData.nickname);
                         var allBet = getAllBets(pNumber, userData.nickname);
                         if (pBet) {
@@ -477,7 +434,7 @@ const BlackjackGame = () => {
                                                                 socket.send(JSON.stringify({ method: "bet", amount: bet, theClient: userData, gameId: gameData.id, seat: pNumber }));
                                                             }}
                                                         >
-                                                            {doCurrencyMil(bet)}
+                                                            {doCurrency(bet)}
                                                         </button>
                                                     </span>
                                                 );
@@ -485,7 +442,7 @@ const BlackjackGame = () => {
                                                 return (
                                                     <span key={i} className={gameTimer < 2 && gameTimer >= -1 && gameData.gameStart ? "animate__zoomOut animate__animated" : ""}>
                                                         <button className="betButtons noclick noclick-nohide animate__animated animate__zoomInUp" style={{ animationDelay: i * 100 + "ms" }} id={"chip" + i} value={bet}>
-                                                            {doCurrencyMil(bet)}
+                                                            {doCurrency(bet)}
                                                         </button>
                                                     </span>
                                                 );
@@ -497,7 +454,7 @@ const BlackjackGame = () => {
                                 {pBet && (
                                     <div className={"player-coin"}>
                                         <button className="betButtons noclick animate__animated animate__rotateIn" id={"chip" + _renge.findIndex((bet) => bet == pBet.bet)}>
-                                            {doCurrencyMil(pBet.bet)}
+                                            {doCurrency(pBet.bet)}
                                         </button>
                                     </div>
                                 )}
@@ -513,7 +470,7 @@ const BlackjackGame = () => {
                                                     on='hover'
                                                     trigger={
                                                         <button className="betButtons animate__animated animate__zoomInDown" style={{ animationDelay: (pNumber + 1) * 50 + "ms", left: pNumber * 5, top: pNumber * 15 }} id={"chip" + _renge.findIndex((bet) => bet == player.amount)}>
-                                                            {doCurrencyMil(player.amount)}
+                                                            {doCurrency(player.amount)}
                                                         </button>
                                                     }
                                                     content={
@@ -521,7 +478,7 @@ const BlackjackGame = () => {
                                                             <img src={"/imgs/avatars/" + player?.avatar + ".webp"} style={{ height: 30, marginRight: 10, float: "left" }} />
                                                             {player.nickname}
                                                             <br />
-                                                            <small>{doCurrencyMil(player.amount)}</small>
+                                                            <small>{doCurrency(player.amount)}</small>
                                                         </div>
                                                     }
                                                 />
